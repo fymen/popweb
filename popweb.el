@@ -209,43 +209,6 @@ Turn on this option will improve start speed."
 (defun popweb-emacs-running-in-wayland-native ()
   (eq window-system 'pgtk))
 
-(defun popweb--build-process-environment ()
-  (let ((environments (seq-filter
-                       (lambda (var)
-                         (and (not (string-match-p "QT_SCALE_FACTOR" var))
-                              (not (string-match-p "QT_SCREEN_SCALE_FACTOR" var))))
-                       process-environment)))
-    (when popweb-enable-debug
-      (add-to-list 'environments "QT_DEBUG_PLUGINS=1" t))
-
-    (unless (eq system-type 'darwin)
-      (add-to-list 'environments
-                   (cond
-                    ((popweb-emacs-running-in-wayland-native)
-                     ;; Wayland native need to set QT_AUTO_SCREEN_SCALE_FACTOR=1
-                     ;; otherwise Qt window only have half of screen.
-                     "QT_AUTO_SCREEN_SCALE_FACTOR=1")
-                    (t
-                     ;; XWayland need to set QT_AUTO_SCREEN_SCALE_FACTOR=0
-                     ;; otherwise Qt which explicitly force high DPI enabling get scaled TWICE.
-                     "QT_AUTO_SCREEN_SCALE_FACTOR=0"))
-                   t)
-
-      (add-to-list 'environments "QT_FONT_DPI=96" t)
-
-      ;; Make sure EAF application scale support 4k screen.
-      (add-to-list 'environments "QT_SCALE_FACTOR=1" t)
-
-      ;; Fix CORS problem.
-      (add-to-list 'environments "QTWEBENGINE_CHROMIUM_FLAGS=--disable-web-security" t)
-
-      ;; Use XCB for input event transfer.
-      ;; Only enable this option on Linux platform.
-      (when (and (eq system-type 'gnu/linux)
-                 (not (popweb-emacs-running-in-wayland-native)))
-        (add-to-list 'environments "QT_QPA_PLATFORM=xcb" t)))
-    environments))
-
 (defun popweb-restart-process ()
   "Stop and restart POPWEB process."
   (interactive)
@@ -263,9 +226,6 @@ Turn on this option will improve start speed."
                          (list (number-to-string popweb-server-port))
                          ))
            environments)
-
-      ;; Folow system DPI.
-      (setq environments (popweb--build-process-environment))
 
       ;; Set process arguments.
       (if popweb-enable-debug
