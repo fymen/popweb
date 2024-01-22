@@ -251,6 +251,24 @@ Otherwise return word around point."
                      "Array.from(document.querySelectorAll('iframe')).forEach(e => { e.style.display = 'none' })"
                      ))
 
+(popweb-dict-create "collins"
+                    "https://www.collinsdictionary.com/dictionary/english/%s"
+                    (concat
+                     "window.scrollTo(0, 340); "
+                     "document.getElementsByClassName('navigation')[0].style.display = 'none'; "
+                     "document.getElementsByTagName('body')[0].style.margin = '0'; "
+                     "document.getElementsByTagName('header')[0].style.display = 'none'; "
+                     "document.getElementsByTagName('footer')[0].style.display = 'none'; "
+                     "document.getElementsByClassName('search')[0].style.display = 'none'; "
+                     "document.getElementsByClassName('page')[0].style.visibility = 'visible' ; "
+                     "document.getElementsByClassName('page')[0].style.margin = '0' ; "
+                     "document.getElementsByClassName('padding-hub')[0].style.visibility = 'hidden' ; "
+                     "document.getElementsByClassName('padding-hub')[0].style.margin = '0' ; "
+
+                     "Array.from(document.querySelectorAll('ins')).forEach(e => { e.style.display = 'none' }); "
+                     "Array.from(document.querySelectorAll('iframe:not(#player)')).forEach(e => { e.style.display = 'none' }); "
+                     ))
+
 (provide 'popweb-dict)
 
 ;;; popweb-dict.el ends here
